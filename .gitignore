@@ -1,9 +1,20 @@
-server/.env
-web/.env
-node_modules
-sql
-001_init.sql
-002_seed.sql
-package.json
-package-lock.json
+
 vite.config.js
+# node modules
+/node_modules/
+/web/node_modules/
+/server/node_modules/
+
+# env files
+/server/.env
+/web/.env
+
+
+
+# keep SQL migrations/tracking them – so don't ignore them
+# (remove the lines 'sql', '001_init.sql', '002_seed.sql')
+
+
+# editor/OS junk
+.DS_Store
+*.log
