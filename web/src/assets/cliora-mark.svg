@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cliora mark">
+  <defs>
+    <!-- Tweak this to recolor brand accent -->
+    <style>
+      :root { --cliora-accent: #D6A99D; } /* your rose */
+    </style>
+  </defs>
+
+  <!-- Bag body -->
+  <rect x="40" y="76" width="176" height="144" rx="24"
+        fill="none" stroke="var(--cliora-accent)" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Handle -->
+  <path d="M88 76v-8c0-26 18-46 40-46s40 20 40 46v8"
+        fill="none" stroke="var(--cliora-accent)" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Check -->
+  <path d="M88 148l34 34 58-58"
+        fill="none" stroke="var(--cliora-accent)" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

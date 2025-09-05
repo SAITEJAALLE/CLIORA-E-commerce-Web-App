@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Cliora logo">
+  <defs>
+    <style>
+      :root {
+        --cliora-accent: #D6A99D; /* rose (accent, icon + highlights) */
+        --cliora-ink:    #0F1412; /* deep text if you want darker wordmark */
+        --cliora-text:   #9CAFAA; /* muted teal-gray (optional) */
+      }
+      .mark { stroke: var(--cliora-accent); }
+      .word { fill: var(--cliora-ink); }
+      .tag  { fill: var(--cliora-accent); letter-spacing: .28em; }
+    </style>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(20 22)">
+    <rect x="0" y="54" width="156" height="128" rx="22"
+          fill="none" class="mark" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28 54v-8c0-24 17-42 38-42s38 18 38 42v8"
+          fill="none" class="mark" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M30 126l30 30 60-60"
+          fill="none" class="mark" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(210 30)">
+    <!-- Using system serif for a luxe look; you can swap to Playfair/serif in CSS where embedded -->
+    <text class="word" x="0" y="110"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-weight="700" font-size="110">CLIORA</text>
+    <text class="tag"  x="4" y="170"
+          font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Arial"
+          font-weight="700" font-size="26">E-COMMERCE</text>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+server/.env
+web/.env
+node_modules
+sql
+001_init.sql
+002_seed.sql
+package.json
+package-lock.json
+vite.config.js
