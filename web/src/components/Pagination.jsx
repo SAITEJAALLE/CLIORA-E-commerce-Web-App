@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 // Simple pagination control. Renders page numbers and previous/next
 // controls. Calls onPageChange with the new page number.

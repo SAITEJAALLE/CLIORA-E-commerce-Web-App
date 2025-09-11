@@ -1,5 +1,5 @@
 // web/src/App.jsx
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import { AuthContext } from './context/AuthContext.jsx';
