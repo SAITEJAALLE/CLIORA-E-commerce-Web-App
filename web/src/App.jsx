@@ -10,7 +10,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Admin from './pages/Admin.jsx';
 import Footer from "./components/Footer.jsx";
-
+import React, { useState, useContext } from 'react';
 
 function RequireAdmin({ children }) {
   const { user } = useContext(AuthContext) || {};
