@@ -1,4 +1,6 @@
 // web/src/main.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -8,7 +10,7 @@ import { CartProvider } from './context/CartContext.jsx';
 import './styles.css';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
@@ -16,5 +18,5 @@ createRoot(document.getElementById('root')).render(
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>
+  </React.StrictMode>
 );
