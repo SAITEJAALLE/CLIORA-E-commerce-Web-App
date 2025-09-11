@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api.js';
+import ReactDOM from 'react-dom/client'
+
 
 // Context providing authentication state and actions. Stores user
 // and token in localStorage to persist across page refreshes.

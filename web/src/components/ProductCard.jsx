@@ -1,5 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ReactDOM from 'react-dom/client'
+import ReactDOM from 'react-dom/client'
+
+
 import { CartContext } from '../context/CartContext.jsx';
 
 export default function ProductCard({ product }) {

@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../api.js';
 import { AuthContext } from './AuthContext.jsx';
+import ReactDOM from 'react-dom/client'
+
 
 // Cart context maintains a list of items and synchronises with the
 // backend when the user is logged in. When logged out it stores the

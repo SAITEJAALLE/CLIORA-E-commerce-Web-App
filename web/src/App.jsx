@@ -11,6 +11,7 @@ import Register from './pages/Register.jsx';
 import Admin from './pages/Admin.jsx';
 import Footer from "./components/Footer.jsx";
 
+
 function RequireAdmin({ children }) {
   const { user } = useContext(AuthContext) || {};
   if (!user || user.role !== 'admin') {
