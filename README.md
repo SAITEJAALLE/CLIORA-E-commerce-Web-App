@@ -300,4 +300,4 @@ Basic tests (Jest + Supertest + React Testing Library).
 
 ## License
 
-MIT — free to use, modify, and distribute. A star is always appreciated!
+MIT: free to use, modify, and distribute. A star is always appreciated!
