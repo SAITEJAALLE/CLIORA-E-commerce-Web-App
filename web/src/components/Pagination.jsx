@@ -1,5 +1,3 @@
-
-
 // Simple pagination control. Renders page numbers and previous/next
 // controls. Calls onPageChange with the new page number.
 function Pagination({ total, pageSize, currentPage, onPageChange }) {

@@ -1,4 +1,3 @@
-// web/src/App.jsx
 import { useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
 

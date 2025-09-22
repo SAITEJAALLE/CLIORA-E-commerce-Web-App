@@ -1,39 +1,34 @@
-
-import { Link } from 'react-router-dom';
-import ReactDOM from 'react-dom/client'
-
-
-import { CartContext } from '../context/CartContext.jsx';
+import { useContext, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext.jsx";
 
 export default function ProductCard({ product }) {
-  const { setCart } = React.useContext(CartContext);
+  const { addItem } = useContext(CartContext);
 
-  const price = `£${(Number(product.price_cents || 0) / 100).toFixed(2)}`;
-  const img = product.image || (product.images && product.images[0]) || null;
+  const pid = product?.id ?? product?._id ?? product?.product_id;
+  const img = product?.image || (Array.isArray(product?.images) ? product.images[0] : null);
+
+  const price = useMemo(() => {
+    const cents = Number(product?.price_cents || 0);
+    return `£${(cents / 100).toFixed(2)}`;
+  }, [product]);
 
   const bgStyle = img
     ? { backgroundImage: `url(${img})` }
-    : { backgroundImage: 'linear-gradient(135deg,#e8e3cf,#e2d7c6)' };
+    : { backgroundImage: "linear-gradient(135deg,#e8e3cf,#e2d7c6)" };
 
-  function addToCart() {
-    setCart(prev => {
-      const items = [...(prev?.items || [])];
-      const idx = items.findIndex(i => i.id === product.id);
-      if (idx >= 0) {
-        items[idx] = { ...items[idx], qty: Number(items[idx].qty || 1) + 1 };
-      } else {
-        items.push({
-          id: product.id,
-          name: product.name,
-          image: img,
-          price_cents: product.price_cents,
-          category_name: product.category_name || '',
-          qty: 1,
-        });
-      }
-      return { ...(prev || {}), items };
+  const handleAdd = () => {
+    if (!pid) return;
+    addItem({
+      id: pid,
+      name: product.name,
+      slug: product.slug,
+      price_cents: product.price_cents,
+      currency: product.currency || "GBP",
+      image: img || null,
+      category_name: product.category_name || "",
     });
-  }
+  };
 
   return (
     <div className="card">
@@ -42,12 +37,21 @@ export default function ProductCard({ product }) {
       </div>
 
       <div className="card-content">
-        <h3 className="card-title">{product.name}</h3>
-        <p className="card-desc">{product.description || product.category_name || ' '}</p>
+        <h3 className="card-title">{product?.name}</h3>
+        <p className="card-desc">{product?.description || product?.category_name || " "}</p>
 
         <div className="card-actions">
-          <Link className="btn-ghost" to={`/products/${product.id}`}>View</Link>
-          <button className="btn" onClick={addToCart}>Add to Cart</button>
+          <Link
+            className="btn-ghost"
+            to={pid ? `/products/${pid}` : "#"}
+            onClick={(e) => { if (!pid) e.preventDefault(); }}
+            aria-disabled={!pid}
+          >
+            View
+          </Link>
+          <button className="btn" onClick={handleAdd} disabled={!pid}>
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>

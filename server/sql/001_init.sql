@@ -1,6 +1,6 @@
 -- Set up initial database schema for the e-commerce application. This
 -- script creates custom enum types for roles and order statuses as
--- well as all tables needed by the API. Run with "npm run db:migrate".
+-- well as all tables needed by the API. ]
 
 -- Enum types
 DO $$ BEGIN

@@ -152,7 +152,7 @@ button[disabled], .btn[disabled]{ opacity:.6; cursor:not-allowed; }
    PRODUCT GRID — COMPACT
     */
 .product-grid{
-  display:grid; gap: 12px;
+  display:grid; gap: 30px;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
@@ -256,6 +256,11 @@ button[disabled], .btn[disabled]{ opacity:.6; cursor:not-allowed; }
 .container h1, .container h2{ color: var(--ink); letter-spacing: .3px; }
 .container h1{ font-size: 2.0rem; margin: 10px 0 18px; }
 .container h2{ font-size: 1.45rem; margin: 18px 0 10px; }
+
+.container--wide { max-width: 1450px; }   
+@media (min-width: 1600px){
+  .container--wide { max-width: 1540px; } /* optional, for very large screens */
+}
 
 .admin-panel{
   background: #fff; border: 1px solid rgba(156,175,170,.35);

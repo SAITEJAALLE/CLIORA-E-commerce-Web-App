@@ -7,7 +7,7 @@ import { requireAuth } from '../middlewares/auth.js';
 const router = Router();
 
 /** default role must match your Postgres enum (user_role) */
-const DEFAULT_ROLE = 'customer'; // <— was 'user' (not in your enum)
+const DEFAULT_ROLE = 'customer';  
 
 /** normalize email */
 function normEmail(v = '') {
@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    // IMPORTANT: role value must exist in your enum (admin/customer)
+    // IMPORTANT: role value must exist in enum (admin/customer)
     const ins = await pool.query(
       `INSERT INTO users (name, email, password_hash, role)
        VALUES ($1, $2, $3, $4)

@@ -1,85 +1,155 @@
-import { Router } from 'express';
-import { pool } from '../db.js';
-import { requireAuth } from '../middlewares/auth.js';
+import { Router } from "express";
+import { pool } from "../db.js";
+import { requireAuth } from "../middlewares/auth.js";
 
 const router = Router();
 
 /**
- * Ensure a cart exists for the given user. Returns the cart id.
- */
-async function ensureCart(userId) {
-  const existing = await pool.query('SELECT id FROM carts WHERE user_id=$1', [userId]);
-  let cartId;
-  if (existing.rows[0]) {
-    cartId = existing.rows[0].id;
-  } else {
-    const res = await pool.query('INSERT INTO carts (user_id) VALUES ($1) RETURNING id', [userId]);
-    cartId = res.rows[0].id;
-  }
-  return cartId;
-}
-
-/**
  * GET /api/cart
- * Returns the current user's cart with items and product details. If
- * no cart exists an empty list is returned.
+ * Returns: { items: [{ product_id, name, unit_price_cents, currency, image, quantity }...] }
+ * Joins products but falls back to stored fields if product was changed/removed.
  */
-router.get('/', requireAuth, async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   try {
-    const cartRes = await pool.query('SELECT id FROM carts WHERE user_id=$1', [req.user.id]);
-    if (!cartRes.rows[0]) {
-      return res.json({ items: [] });
-    }
-    const cartId = cartRes.rows[0].id;
-    const itemsRes = await pool.query(
-      `SELECT ci.id, ci.quantity, ci.unit_price_cents, p.id AS product_id, p.name, p.slug, p.price_cents, p.currency,
-              (SELECT path FROM product_images i WHERE i.product_id=p.id AND is_primary=true LIMIT 1) AS image
-       FROM cart_items ci
-       JOIN products p ON ci.product_id=p.id
-       WHERE ci.cart_id=$1`,
-      [cartId]
-    );
-    return res.json({ items: itemsRes.rows });
+    const userId = req.user.id;
+
+    const sql = `
+      SELECT
+        ci.product_id::text                                   AS product_id,
+        ci.quantity,
+        COALESCE(ci.unit_price_cents, p.price_cents, 0)       AS unit_price_cents,
+        COALESCE(ci.currency, p.currency, 'GBP')              AS currency,
+        COALESCE(ci.name, p.name, 'Unknown')                  AS name,
+        COALESCE(
+          ci.image,
+          (
+            SELECT path FROM product_images i
+            WHERE i.product_id = p.id
+            ORDER BY is_primary DESC, id ASC
+            LIMIT 1
+          ),
+          ''
+        )                                                     AS image
+      FROM cart_items ci
+      LEFT JOIN products p
+        ON p.id::text = ci.product_id::text
+      WHERE ci.user_id = $1
+      ORDER BY ci.id ASC;
+    `;
+    const { rows } = await pool.query(sql, [userId]);
+    res.json({ items: rows });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Error fetching cart' });
+    console.error("GET /api/cart error:", err);
+    res.status(500).json({ message: "Failed to fetch cart" });
   }
 });
 
 /**
  * POST /api/cart
- * Updates the user's cart with an array of items. Each item should
- * include product_id and quantity. The server calculates unit prices
- * from the products table to prevent tampering. Existing cart items
- * are replaced with the new list.
+ * Body: { items: [{ product_id, quantity }] }
+ * Upserts items for the current user. quantity 0 removes the item.
+ * Accepts UUIDs or integers for product_id.
  */
-router.post('/', requireAuth, async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
+  const userId = req.user.id;
+  const items = Array.isArray(req.body?.items) ? req.body.items : [];
+
+  if (!items.length) return res.json({ ok: true, items: [] });
+
+  // limit to something reasonable
+  const safe = items.slice(0, 100).map((it) => ({
+    product_id: String(it.product_id || "").trim(),
+    quantity: Number(it.quantity || 0),
+  }));
+
+  const client = await pool.connect();
   try {
-    const { items } = req.body;
-    if (!Array.isArray(items)) {
-      return res.status(400).json({ message: 'Items should be an array' });
-    }
-    const userId = req.user.id;
-    const cartId = await ensureCart(userId);
-    // Clear existing items
-    await pool.query('DELETE FROM cart_items WHERE cart_id=$1', [cartId]);
-    // Insert new items
-    for (const item of items) {
-      const { product_id, quantity } = item;
-      const qty = parseInt(quantity, 10);
-      if (!product_id || Number.isNaN(qty) || qty <= 0) continue;
-      const productRes = await pool.query('SELECT price_cents FROM products WHERE id=$1', [product_id]);
-      const product = productRes.rows[0];
-      if (!product) continue;
-      await pool.query(
-        'INSERT INTO cart_items (cart_id, product_id, quantity, unit_price_cents) VALUES ($1,$2,$3,$4)',
-        [cartId, product_id, qty, product.price_cents]
+    await client.query("BEGIN");
+
+    for (const it of safe) {
+      if (!it.product_id) continue;
+
+      if (it.quantity <= 0) {
+        await client.query(
+          "DELETE FROM cart_items WHERE user_id = $1 AND product_id::text = $2",
+          [userId, it.product_id]
+        );
+        continue;
+      }
+
+      // Get canonical product fields for snapshot (name, price, image)
+      const psql = `
+        SELECT
+          p.id,
+          p.name,
+          p.price_cents,
+          p.currency,
+          (
+            SELECT path FROM product_images i
+            WHERE i.product_id = p.id
+            ORDER BY is_primary DESC, id ASC
+            LIMIT 1
+          ) AS image
+        FROM products p
+        WHERE p.id::text = $1
+        LIMIT 1
+      `;
+      const { rows: prow } = await client.query(psql, [it.product_id]);
+      if (!prow[0]) {
+        // if product not found, skip insert (or you may choose to 404)
+        continue;
+      }
+      const snap = prow[0];
+
+      // Try update first
+      const upd = await client.query(
+        `UPDATE cart_items
+           SET quantity = $1,
+               unit_price_cents = $2,
+               currency = COALESCE($3, 'GBP'),
+               name = $4,
+               image = $5,
+               updated_at = now()
+         WHERE user_id = $6 AND product_id::text = $7
+         RETURNING id`,
+        [
+          it.quantity,
+          snap.price_cents,
+          snap.currency,
+          snap.name,
+          snap.image || "",
+          userId,
+          it.product_id,
+        ]
       );
+
+      if (!upd.rowCount) {
+        // Insert if not exists
+        await client.query(
+          `INSERT INTO cart_items
+             (user_id, product_id, quantity, unit_price_cents, currency, name, image)
+           VALUES ($1,        $2,         $3,       $4,               $5,      $6,   $7)`,
+          [
+            userId,
+            it.product_id,
+            it.quantity,
+            snap.price_cents,
+            snap.currency || "GBP",
+            snap.name,
+            snap.image || "",
+          ]
+        );
+      }
     }
-    return res.json({ ok: true });
+
+    await client.query("COMMIT");
+    res.json({ ok: true });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Error updating cart' });
+    await client.query("ROLLBACK");
+    console.error("POST /api/cart error:", err);
+    res.status(500).json({ message: "Failed to update cart" });
+  } finally {
+    client.release();
   }
 });
 

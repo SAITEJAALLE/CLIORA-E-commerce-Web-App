@@ -11,10 +11,6 @@ vite.config.js
 
 
 
-# keep SQL migrations/tracking them – so don't ignore them
-# (remove the lines 'sql', '001_init.sql', '002_seed.sql')
-
-
 # editor/OS junk
 .DS_Store
 *.log
