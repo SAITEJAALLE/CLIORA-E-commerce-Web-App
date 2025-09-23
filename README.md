@@ -2,6 +2,11 @@
 
 A production-ready, searchable and sortable store with admin product CRUD, JWT auth (access + refresh), image uploads, and a resilient cart (guest in localStorage, user-synced via API). Designed to be simple to run locally and easy to deploy (Render + Vercel).
 
+<p align="center">
+  <img src="Images/homepage.png" width="600" alt="Homepage">
+</p>
+                                                    Homepage
+     
 ## Features:
 
 ### 1.Products
@@ -10,23 +15,38 @@ Grid with search (?q=), sort (?sort=new|price_asc|price_desc), optional category
 
 Product details page by :id (supports both UUID and integer ids).
 
+<p align="center">
+  <img src="Images/keyword.png" width="600" alt="Homepage">
+</p>
+    keyword search is implemented
+    
 ### 2.Cart
 
 Guest cart persists in localStorage.
-
+<p align="center">
+  <img src="Images/cart.png" width="600" alt="cart">
+</p>
 Logged-in cart syncs to API automatically.
 
 ### 3.Auth
 
 Email/password login.
+<p align="center">
+  <img src="Images/login.png" width="600" alt="login">
+</p>
 
 Access token (Authorization header) + refresh token (HTTP-only cookie).
-
+<p align="center">
+  <img src="Images/create account.png" width="600" alt="login">
+</p>
 Axios auto-refresh on 401.
 
 ### 4.Admin
 
 Add / edit / delete products.
+<p align="center">
+  <img src="Images/admin dashboard.png" width="600" alt="Homepage">
+</p>
 
 Multi-image upload with Multer; primary image support.
 
@@ -298,6 +318,38 @@ Basic tests (Jest + Supertest + React Testing Library).
 
 ### Image CDN + thumbnailing.
 
+## Working images 
+
+### Profile
+<p align="center">
+  <img src="Images/login profile.png" width="600" alt="login profile">
+</p> 
+
+## keyword searching option
+<p align="center">
+  <img src="Images/keyword.png" width="600" alt="keyword">
+</p>
+
+## filter options
+<p align="center">
+  <img src="Images/filter option.png" width="600" alt="filter option">
+</p>
+
+## Checkout page
+<p align="center">
+  <img src="Images/checkout.png" width="600" alt="checkoutPage">
+</p>
+
+## admin Order Confirmed Page
+<p align="center">
+  <img src="Images/admin confirmed order.png" width="600" alt="orderConfirmPage">
+</p>
+
+
+## Footer 
+<p align="center">
+  <img src="Images/footer.png" width="600" alt="footer">
+</p>
 ## License
 
 MIT: free to use, modify, and distribute. A star is always appreciated!
